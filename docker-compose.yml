@@ -1,0 +1,26 @@
+version: '3'
+services: 
+  dl:
+    build: .
+    entrypoint: /run.sh
+    ports: 
+      - "12222:22"   #对应ssh端口，注意填写前先查看端口号占用情况(可只更改x)
+      - "18888:8888" #对应jupyter端口，注意填写前先查看端口号占用情况(可只更改x)
+      - "16006:6006" #tensorboard
+    volumes:
+      - ../data:/data 
+    cap_add:
+      - SYS_ADMIN 
+      - DAC_READ_SEARCH
+    security_opt:
+      - apparmor:unconfined 
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0'] #需将x更改空闲的gpu,默认每次每人用一块
+              capabilities: [gpu]
+
